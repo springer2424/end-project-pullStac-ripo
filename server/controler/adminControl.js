@@ -41,7 +41,7 @@ export const logIn = async (req,res) => {
             user,
             token
         }
-        res.status(200).json({msg:"seccess",data:userAndToken})
+        res.status(200).json({msg:"seccess",data: userAndToken})
     }catch(err){
         res.status(500).json({msg:"samthing went rong",data:null})
     }
