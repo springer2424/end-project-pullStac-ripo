@@ -6,6 +6,7 @@ export const createReporrt = async (req,res) => {
        const {category, urgency, message} = req.body;
        const newReport = {
         userid:req.user._id,
+        agentCode:req.user.agentCode,
         category,
         urgency,
         message,
@@ -60,7 +61,13 @@ const bufferToObject = async (req,res) => {
 export const createReporrtsFromCsv = async (req,res) => {
     try{
         const data = await bufferToObject(req,res)
-       const newReports = data.map((report) =>({ userid:req.user._id,...report,sourceType:"csvFile",createdAt:new Date().toLocaleString()}));
+       const newReports = data.map((report) =>({ 
+        userid:req.user._id,
+        agentCode:req.user.agentCode,
+        ...report,
+        sourceType:"csvFile"
+        ,createdAt:new Date().toLocaleString()
+    }));
        const mongoConn = await getMongoDbConn()
        const reportCollection = mongoConn.collection("reports")
        const reports = await reportCollection.insertMany(newReports)
@@ -73,28 +80,21 @@ export const createReporrtsFromCsv = async (req,res) => {
 export const getReports = async (req,res) => {
     let serchBy;
     const {agentCode, category, urgency} = req.query;
-    if(agentCode){
-        serchBy = agentCode
-    }
-    if(category){
-        serchBy = category
-    }
-    if(urgency){
-        serchBy = urgency   
-    }
+    const {role} = req.user;
+    const reportAgentCode = req.user.agentCode
     try{
         const mongoConn = await getMongoDbConn()
         const reportCollection = mongoConn.collection("reports")
         if(agentCode){
-        serchBy = {agentCode:agentCode} 
+        serchBy = role === "admin"? {agentCode:agentCode} : {agentCode:agentCode,agentCode:reportAgentCode}
         }
         if(category){
-        serchBy = {category:category} 
+        serchBy = role === "admin"?  {category:category} : {category:category,agentCode:reportAgentCode} 
         }
         if(urgency){
-        serchBy = {urgency:urgency}  
+        serchBy = role === "admin"?  {urgency:urgency} : {urgency:urgency,agentCode:reportAgentCode}  
         }
-        const reportsToPrint = await reportCollection.find(serchBy ? serchBy :{}).toArray()
+        const reportsToPrint = await reportCollection.find(serchBy ? serchBy :role === "admin"? {} : {agentCode:reportAgentCode}).toArray()
         return res.status(200).json({msg:"seccess",data:reportsToPrint})
 
     }catch(arr){
