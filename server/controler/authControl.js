@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken"
 import { getMongoDbConn } from "../db/dbConect.js";
 import { ObjectId } from "mongodb";
+import dotenv from "dotenv"
+dotenv.config()
 
 export const authMidelwer = async (req, res, next) => {
   try {
@@ -9,7 +11,7 @@ export const authMidelwer = async (req, res, next) => {
       return res.status(401).json({ message: "no token provaided" })
     }
     const token = authHeader.split(" ")[1];
-    const decoded = jwt.verify(token, "123")
+    const decoded = jwt.verify(token, process.env.SECRET_JWT)
 
     const mongoConn = await getMongoDbConn();
     const usersCollection = mongoConn.collection("usersData");

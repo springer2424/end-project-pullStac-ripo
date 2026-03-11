@@ -1,6 +1,8 @@
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv"
+dotenv.config()
 
-const MONGO_URL = "mongodb+srv://ychiel_db:yechiel123@cluster0.m6onqol.mongodb.net/?appName=Cluster0";
+const MONGO_URL = process.env.MONGO_DB_URI;
 const DB_NAME = "egentsDb";
 const COLLECTION_NAME = "usersData"
 
@@ -15,7 +17,7 @@ export async function initMongoDb() {
     
     console.log("Database initialized");
   } catch (error) {
-    console.error("Error initializing database:", error);
+    console.error("Error initializing database:", error.message);
     throw error;
   }
 }

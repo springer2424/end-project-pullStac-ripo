@@ -1,6 +1,7 @@
 import { parse } from "csv-parse/sync";
 import { getMongoDbConn } from "../db/dbConect.js";
 import multer, { memoryStorage } from "multer"
+import { ObjectId } from "mongodb";
 export const createReporrt = async (req,res) => {
     try{
        const {category, urgency, message} = req.body;
@@ -96,6 +97,23 @@ export const getReports = async (req,res) => {
         }
         const reportsToPrint = await reportCollection.find(serchBy ? serchBy :role === "admin"? {} : {agentCode:reportAgentCode}).toArray()
         return res.status(200).json({msg:"seccess",data:reportsToPrint})
+
+    }catch(arr){
+        res.status(500).json({msg:arr.message,data:null})
+    }
+}
+
+export const getReportsById = async (req,res) => {
+    let serchBy;
+    const {id} = req.params;
+    const {role} = req.user;
+    const userId = req.user._id;
+    try{
+        const mongoConn = await getMongoDbConn()
+        const reportCollection = mongoConn.collection("reports")
+        serchBy = role === "admin"?  {_id:new ObjectId(id)} : {_id:new ObjectId(id),userid:new ObjectId(userId)}  
+        const reportToPrint = await reportCollection.findOne(serchBy)
+        return res.status(200).json({msg:"seccess",data:reportToPrint})
 
     }catch(arr){
         res.status(500).json({msg:arr.message,data:null})

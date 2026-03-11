@@ -36,7 +36,7 @@ export const logIn = async (req,res) => {
         if(!user.passwordHash === password){
             res.status(400).json({msg:"rong password"})
         }
-        const token = jwt.sign({id: user._id},"123",{expiresIn:"1h"})
+        const token = jwt.sign({id: user._id},process.env.SECRET_JWT,{expiresIn:"1h"})
         const userAndToken = {
             user,
             token
