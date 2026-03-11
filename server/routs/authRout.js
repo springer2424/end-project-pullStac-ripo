@@ -1,7 +1,8 @@
 import express from "express"
 import { createAgent, logIn } from "../controler/adminControl.js";
 import { authMidelwer, otheraz } from "../controler/authControl.js";
-import { createReporrt, createReporrtsFromCsv, getReports, getReportsById, upload } from "../controler/reportControler.js";
+import { createReporrt, createReporrtsFromCsv, getReports, getReportsById} from "../controler/reportControler.js";
+import { upload } from "../serves/authServes.js";
 
 const router = express.Router();
 
